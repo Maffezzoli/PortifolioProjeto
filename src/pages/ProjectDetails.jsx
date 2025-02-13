@@ -1,39 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { projectService } from '../services/projectService';
-
-function ImageWithLayout({ image }) {
-  const layoutClasses = {
-    full: "w-full mb-8 clear-both",
-    left: "float-left mr-8 mb-4 w-[300px] md:w-[400px]",
-    right: "float-right ml-8 mb-4 w-[300px] md:w-[400px]"
-  };
-
-  const containerClasses = {
-    full: "w-full mb-8",
-    left: "w-full mb-4 after:content-[''] after:clear-both after:table",
-    right: "w-full mb-4 after:content-[''] after:clear-both after:table"
-  };
-
-  return (
-    <div className={containerClasses[image.layout]}>
-      <figure className={layoutClasses[image.layout]}>
-        <div className="aspect-w-16 aspect-h-9 mb-2">
-          <img
-            src={image.url}
-            alt={image.description}
-            className="rounded-lg shadow-lg object-cover w-full h-full"
-          />
-        </div>
-        {image.description && (
-          <figcaption className="mt-2 text-sm text-gray-600 text-center">
-            {image.description}
-          </figcaption>
-        )}
-      </figure>
-    </div>
-  );
-}
+import ImageWithLayout from '../components/ImageWithLayout';
 
 function ProjectDetails() {
   const { id } = useParams();
@@ -83,6 +51,30 @@ function ProjectDetails() {
     );
   }
 
+  const textStyleClasses = {
+    fontSize: {
+      normal: 'text-base',
+      large: 'text-lg',
+      xl: 'text-xl'
+    },
+    alignment: {
+      left: 'text-left',
+      center: 'text-center',
+      justify: 'text-justify'
+    },
+    fontFamily: {
+      sans: 'font-sans',
+      serif: 'font-serif',
+      mono: 'font-mono'
+    }
+  };
+
+  const textClasses = project.textStyle ? `
+    ${textStyleClasses.fontSize[project.textStyle.fontSize]}
+    ${textStyleClasses.alignment[project.textStyle.alignment]}
+    ${textStyleClasses.fontFamily[project.textStyle.fontFamily]}
+  ` : '';
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Cabeçalho do Projeto */}
@@ -105,7 +97,7 @@ function ProjectDetails() {
       {/* Conteúdo do Projeto com Imagens */}
       <div className="prose max-w-none">
         <div className="relative flow-root">
-          <div className="whitespace-pre-wrap text-gray-700">
+          <div className={`whitespace-pre-wrap text-gray-700 ${textClasses}`}>
             {project.content}
           </div>
 
