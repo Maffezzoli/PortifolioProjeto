@@ -1,11 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { artworkService } from '../firebase/artworkService';
+import { galleryService } from '../services/galleryService';
 
-function ArtworkForm({ onSuccess, onError }) {
+function ArtworkForm({ artwork, onSuccess, onError }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [config, setConfig] = useState(null);
+
+  useEffect(() => {
+    loadGalleryConfig();
+  }, []);
+
+  const loadGalleryConfig = async () => {
+    try {
+      const data = await galleryService.getConfig();
+      setConfig(data);
+    } catch (error) {
+      console.error('Erro ao carregar configurações da galeria:', error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,6 +82,26 @@ function ArtworkForm({ onSuccess, onError }) {
           accept="image/*"
           required
         />
+      </div>
+      <div>
+        <label className="block text-gray-700 mb-2">Categoria</label>
+        <select
+          value={artwork?.category || ''}
+          onChange={(e) => {
+            // Assuming you want to update the category of the artwork
+            // You might want to implement a way to update the category in your artworkService
+            // For now, we'll just update the local state
+            setArtwork(prev => ({ ...prev, category: e.target.value }));
+          }}
+          className="w-full px-4 py-2 border rounded-lg"
+        >
+          <option value="">Selecione uma categoria</option>
+          {config?.categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
       <button
         type="submit"
