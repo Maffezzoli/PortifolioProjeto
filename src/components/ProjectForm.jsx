@@ -2,19 +2,21 @@ import { useState } from 'react';
 import { projectService } from '../services/projectService';
 import ProjectPreview from './ProjectPreview';
 
-function ProjectForm({ onSuccess }) {
-  const [project, setProject] = useState({
-    title: '',
-    description: '',
-    content: '',
-    images: [],
-    textStyle: {
-      fontSize: 'normal', // normal, large, xl
-      alignment: 'left', // left, center, justify
-      fontFamily: 'sans' // sans, serif, mono
-    },
-    spacing: 'normal' // novo campo para espaçamento
-  });
+function ProjectForm({ project: initialProject, onSuccess }) {
+  const [project, setProject] = useState(
+    initialProject || {
+      title: '',
+      description: '',
+      content: '',
+      images: [],
+      textStyle: {
+        fontSize: 'normal', // normal, large, xl
+        alignment: 'left', // left, center, justify
+        fontFamily: 'sans' // sans, serif, mono
+      },
+      spacing: 'normal' // novo campo para espaçamento
+    }
+  );
   const [coverImage, setCoverImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -58,12 +60,14 @@ function ProjectForm({ onSuccess }) {
     setError('');
 
     try {
-      await projectService.addProject(project, coverImage);
-      setProject({ title: '', description: '', content: '', images: [], textStyle: { fontSize: 'normal', alignment: 'left', fontFamily: 'sans' }, spacing: 'normal' });
-      setCoverImage(null);
+      if (initialProject) {
+        await projectService.updateProject(initialProject.id, project, coverImage);
+      } else {
+        await projectService.addProject(project, coverImage);
+      }
       onSuccess?.();
     } catch (error) {
-      setError('Erro ao criar projeto. Tente novamente.');
+      setError('Erro ao salvar projeto. Tente novamente.');
       console.error(error);
     } finally {
       setLoading(false);
@@ -279,7 +283,7 @@ function ProjectForm({ onSuccess }) {
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {loading ? 'Criando...' : 'Criar Projeto'}
+            {loading ? 'Salvando...' : initialProject ? 'Salvar Alterações' : 'Criar Projeto'}
           </button>
         </form>
       )}

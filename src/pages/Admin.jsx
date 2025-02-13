@@ -2,13 +2,18 @@ import { useState } from 'react';
 import ArtworkForm from '../components/ArtworkForm';
 import ProfileEditor from '../components/ProfileEditor';
 import ProjectForm from '../components/ProjectForm';
+import ProjectList from '../components/ProjectList';
+import ArtworkList from '../components/ArtworkList';
 import { useProjects } from '../hooks/useProjects';
 
 function Admin() {
   const [activeTab, setActiveTab] = useState('profile');
+  const [editingProject, setEditingProject] = useState(null);
+  const [editingArtwork, setEditingArtwork] = useState(null);
   const { reloadProjects } = useProjects();
 
   const handleProjectSuccess = () => {
+    setEditingProject(null);
     reloadProjects();
   };
 
@@ -43,18 +48,77 @@ function Admin() {
           }`}
           onClick={() => setActiveTab('artworks')}
         >
-          Artes
+          Galeria
         </button>
       </div>
 
       {activeTab === 'profile' && <ProfileEditor />}
+      
       {activeTab === 'projects' && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Criar Novo Projeto</h2>
-          <ProjectForm onSuccess={handleProjectSuccess} />
+        <div className="space-y-8">
+          {editingProject ? (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Editar Projeto</h2>
+                <button
+                  onClick={() => setEditingProject(null)}
+                  className="text-gray-600 hover:text-purple-600"
+                >
+                  Cancelar Edição
+                </button>
+              </div>
+              <ProjectForm 
+                project={editingProject} 
+                onSuccess={handleProjectSuccess}
+              />
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Novo Projeto</h2>
+              <ProjectForm onSuccess={handleProjectSuccess} />
+            </div>
+          )}
+
+          <ProjectList 
+            onEdit={setEditingProject}
+            onDelete={reloadProjects}
+          />
         </div>
       )}
-      {activeTab === 'artworks' && <ArtworkForm />}
+      
+      {activeTab === 'artworks' && (
+        <div className="space-y-8">
+          {editingArtwork ? (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Editar Arte</h2>
+                <button
+                  onClick={() => setEditingArtwork(null)}
+                  className="text-gray-600 hover:text-purple-600"
+                >
+                  Cancelar Edição
+                </button>
+              </div>
+              <ArtworkForm 
+                artwork={editingArtwork}
+                onSuccess={() => {
+                  setEditingArtwork(null);
+                }}
+              />
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Nova Arte</h2>
+              <ArtworkForm />
+            </div>
+          )}
+
+          <ArtworkList 
+            onEdit={setEditingArtwork}
+            onDelete={() => {}}
+          />
+        </div>
+      )}
     </div>
   );
 }

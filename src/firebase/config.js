@@ -1,24 +1,28 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVA06gQKUKyryw5UArB5Jpu6ycYh3e3_A",
   authDomain: "portifolioweb-f0cb0.firebaseapp.com",
   projectId: "portifolioweb-f0cb0",
+  storageBucket: "portifolioweb-f0cb0.appspot.com",
   messagingSenderId: "582514786183",
-  appId: "1:582514786183:web:f7af1757269eb6fff11d22",
-  measurementId: "G-5XCCS2BZG5"
+  appId: "1:582514786183:web:f7af1757269eb6fff11d22"
 };
 
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
 // Inicializa o Firestore
-export const db = getFirestore(app);
+const db = getFirestore(app);
 
 // Inicializa o Auth
-export const auth = getAuth(app);
+const auth = getAuth(app);
+
+// Inicializa o Storage
+const storage = getStorage(app);
 
 // Função para verificar se o usuário está autenticado
 export const getCurrentUser = () => {
@@ -28,4 +32,7 @@ export const getCurrentUser = () => {
       resolve(user);
     }, reject);
   });
-}; 
+};
+
+// Exporta todas as instâncias necessárias
+export { db, auth, storage }; 
