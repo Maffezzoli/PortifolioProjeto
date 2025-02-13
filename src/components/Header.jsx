@@ -49,13 +49,14 @@ function Header() {
               <img
                 src={profile.photoUrl}
                 alt={profile.name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-secondary"
+                className="w-12 h-12 rounded-full object-cover border-2"
+                style={{ borderColor: theme.secondary }}
               />
             )}
             <div>
               <Link 
                 to="/" 
-                className="text-2xl font-bold hover:opacity-80"
+                className="text-2xl font-bold hover:opacity-80 transition-opacity"
                 style={{ color: theme.secondary }}
               >
                 {profile?.name || 'Portfólio Artístico'}
@@ -79,8 +80,8 @@ function Header() {
                 onMouseLeave={handleMouseLeave}
               >
                 <button 
-                  className="text-gray-600 transition-colors duration-150"
-                  style={{ '&:hover': { color: theme.primary } }}
+                  className="header-link text-gray-700"
+                  style={{ color: isProjectsOpen ? theme.primary : undefined }}
                 >
                   Projetos
                 </button>
@@ -126,8 +127,7 @@ function Header() {
 
               <Link 
                 to="/galeria" 
-                className="text-gray-600 transition-colors duration-150"
-                style={{ '&:hover': { color: theme.primary } }}
+                className="header-link text-gray-700"
               >
                 Galeria
               </Link>
@@ -136,19 +136,26 @@ function Header() {
                 <>
                   <Link 
                     to="/admin" 
-                    className="text-gray-600 transition-colors duration-150"
-                    style={{ '&:hover': { color: theme.primary } }}
+                    className="header-link text-gray-700"
                   >
                     Admin
                   </Link>
                   <button
                     onClick={logout}
-                    className="text-gray-600 transition-colors duration-150"
-                    style={{ '&:hover': { color: theme.primary } }}
+                    className="header-link text-gray-700"
                   >
                     Sair
                   </button>
                 </>
+              )}
+
+              {!user && (
+                <Link 
+                  to="/login"
+                  className="header-link text-gray-700"
+                >
+                  Login
+                </Link>
               )}
             </nav>
 

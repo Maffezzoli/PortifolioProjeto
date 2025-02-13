@@ -44,16 +44,16 @@ function Gallery() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-full transition-colors duration-200 ${
-              selectedCategory === category.id
-                ? 'text-white'
-                : 'text-gray-700 hover:text-white'
-            }`}
+            className="gallery-button px-4 py-2 rounded-full transition-all duration-200"
             style={{
               backgroundColor: selectedCategory === category.id ? theme.primary : 'transparent',
-              border: `1px solid ${theme.primary}`,
-              '&:hover': {
-                backgroundColor: theme.primary
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: theme.primary,
+              color: selectedCategory === category.id ? 'white' : theme.primary,
+              ':hover': {
+                backgroundColor: theme.primary,
+                color: 'white'
               }
             }}
           >
