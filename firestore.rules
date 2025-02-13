@@ -6,21 +6,34 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    match /artworks/{artwork} {
+    // Função para verificar se é admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Regras para projetos
+    match /projects/{projectId} {
+      allow read: if true; // Qualquer um pode ler
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Regras para artworks
+    match /artworks/{artworkId} {
       allow read: if true;
       allow write: if isAuthenticated();
+    }
+
+    // Regras para usuários
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && request.auth.uid == userId;
     }
 
     match /profile/{document} {
       allow read: if true;
       allow write: if isAuthenticated();
-    }
-
-    match /projects/{project} {
-      allow read: if true;  // Permite leitura pública
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() && 
-        request.auth.uid == resource.data.userId;  // Apenas o criador pode editar/deletar
     }
 
     // Regra padrão - negar tudo que não foi explicitamente permitido

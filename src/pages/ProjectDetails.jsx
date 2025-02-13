@@ -90,7 +90,9 @@ function ProjectDetails() {
 
       {/* Data de Criação */}
       <TextStyled type="caption" className="mt-8">
-        Criado em: {project.createdAt?.toDate().toLocaleDateString()}
+        Criado em: {project.createdAt instanceof Date 
+          ? project.createdAt.toLocaleDateString()
+          : new Date(project.createdAt).toLocaleDateString()}
       </TextStyled>
     </div>
   );

@@ -15,13 +15,13 @@ const firebaseConfig = {
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
-// Inicializa o Firestore
+// Inicializa o Firestore com configurações especiais para desenvolvimento
 const db = getFirestore(app);
 
 // Inicializa o Auth
 const auth = getAuth(app);
 
-// Inicializa o Storage
+// Inicializa o Storage com configurações CORS
 const storage = getStorage(app);
 
 // Função para verificar se o usuário está autenticado

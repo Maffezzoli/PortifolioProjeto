@@ -4,33 +4,45 @@ import { projectService } from '../services/projectService';
 function ProjectList({ onEdit, onDelete }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadProjects();
-  }, []);
+  const [error, setError] = useState(null);
 
   const loadProjects = async () => {
     try {
+      setLoading(true);
       const data = await projectService.getAllProjects();
       setProjects(data);
     } catch (error) {
       console.error('Erro ao carregar projetos:', error);
+      setError('Erro ao carregar projetos');
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este projeto?')) {
       try {
+        setLoading(true);
+        setError(null); // Limpa erros anteriores
         await projectService.deleteProject(id);
+        await loadProjects();
         onDelete?.();
-        loadProjects();
       } catch (error) {
         console.error('Erro ao excluir projeto:', error);
+        setError(error.message || 'Erro ao excluir projeto. Verifique se você está autenticado.');
+      } finally {
+        setLoading(false);
       }
     }
   };
+
+  if (error) {
+    return <div className="text-red-600 text-center">{error}</div>;
+  }
 
   if (loading) {
     return <div className="text-center">Carregando projetos...</div>;
@@ -57,8 +69,9 @@ function ProjectList({ onEdit, onDelete }) {
                 <button
                   onClick={() => handleDelete(project.id)}
                   className="text-red-600 hover:text-red-700"
+                  disabled={loading}
                 >
-                  Excluir
+                  {loading ? 'Excluindo...' : 'Excluir'}
                 </button>
               </div>
             </div>

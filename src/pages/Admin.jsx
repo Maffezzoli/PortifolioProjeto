@@ -5,16 +5,31 @@ import ProjectForm from '../components/ProjectForm';
 import ProjectList from '../components/ProjectList';
 import ArtworkList from '../components/ArtworkList';
 import { useProjects } from '../hooks/useProjects';
+import { useAuth } from '../hooks/useAuth';
 
 function Admin() {
   const [activeTab, setActiveTab] = useState('profile');
   const [editingProject, setEditingProject] = useState(null);
   const [editingArtwork, setEditingArtwork] = useState(null);
+  const [projectsKey, setProjectsKey] = useState(0);
   const { reloadProjects } = useProjects();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (!user) {
+    return <div>Você precisa estar autenticado para acessar esta página</div>;
+  }
 
   const handleProjectSuccess = () => {
     setEditingProject(null);
-    reloadProjects();
+    setProjectsKey(prev => prev + 1);
+  };
+
+  const handleProjectDelete = () => {
+    setProjectsKey(prev => prev + 1);
   };
 
   return (
@@ -80,8 +95,9 @@ function Admin() {
           )}
 
           <ProjectList 
+            key={projectsKey}
             onEdit={setEditingProject}
-            onDelete={reloadProjects}
+            onDelete={handleProjectDelete}
           />
         </div>
       )}

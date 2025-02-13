@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { projectService } from '../services/projectService';
 import ProjectPreview from './ProjectPreview';
+import { auth } from '../firebase/config';
 
 function ProjectForm({ project: initialProject, onSuccess }) {
   const [project, setProject] = useState(
-    initialProject || {
+    initialProject ? {
+      ...initialProject,
+      images: initialProject.images.map(img => ({
+        ...img,
+        file: null // Resetar o arquivo para não tentar fazer upload novamente
+      }))
+    } : {
       title: '',
       description: '',
       content: '',
@@ -60,6 +67,10 @@ function ProjectForm({ project: initialProject, onSuccess }) {
     setError('');
 
     try {
+      if (!auth.currentUser) {
+        throw new Error('Você precisa estar autenticado para criar ou editar projetos');
+      }
+
       if (initialProject) {
         await projectService.updateProject(initialProject.id, project, coverImage);
       } else {
@@ -67,8 +78,8 @@ function ProjectForm({ project: initialProject, onSuccess }) {
       }
       onSuccess?.();
     } catch (error) {
-      setError('Erro ao salvar projeto. Tente novamente.');
-      console.error(error);
+      console.error('Erro:', error);
+      setError(error.message || 'Erro ao salvar projeto. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -123,12 +134,21 @@ function ProjectForm({ project: initialProject, onSuccess }) {
 
           <div>
             <label className="block text-gray-700 mb-2">Imagem de Capa</label>
+            {initialProject?.coverUrl && !coverImage && (
+              <div className="mb-2">
+                <img
+                  src={initialProject.coverUrl}
+                  alt="Capa atual"
+                  className="w-40 h-40 object-cover rounded"
+                />
+              </div>
+            )}
             <input
               type="file"
               onChange={(e) => setCoverImage(e.target.files[0])}
               className="w-full"
               accept="image/*"
-              required
+              required={!initialProject}
             />
           </div>
 
@@ -170,12 +190,21 @@ function ProjectForm({ project: initialProject, onSuccess }) {
                 </div>
 
                 <div>
+                  {image.url && !image.file && (
+                    <div className="mb-2">
+                      <img
+                        src={image.url}
+                        alt={image.description}
+                        className="w-40 h-40 object-cover rounded"
+                      />
+                    </div>
+                  )}
                   <input
                     type="file"
                     onChange={(e) => handleImageChange(index, 'file', e.target.files[0])}
                     className="w-full"
                     accept="image/*"
-                    required
+                    required={!image.url}
                   />
                 </div>
 
