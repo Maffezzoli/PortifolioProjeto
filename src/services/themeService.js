@@ -12,12 +12,12 @@ export const themeService = {
     if (!docSnap.exists()) {
       // Retorna cores padrão se não existir configuração
       return {
-        primary: '#FFFFFF',
+        primary: '#9333EA', // Voltando para roxo (purple-600)
         secondary: '#4F46E5',
         accent: '#EC4899',
         background: '#F9FAFB',
         text: '#111827',
-        header: '#FFFFFF', // Nova cor para o header
+        header: '#FFFFFF',
       };
     }
     

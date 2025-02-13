@@ -5,7 +5,7 @@ const ThemeContext = createContext();
 
 // Definindo as cores padrão em uma constante
 const defaultTheme = {
-  primary: '#FFFFFF',
+  primary: '#9333EA',
   secondary: '#4F46E5',
   accent: '#EC4899',
   background: '#F9FAFB',

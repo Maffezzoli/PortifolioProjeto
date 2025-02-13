@@ -49,11 +49,15 @@ function Header() {
               <img
                 src={profile.photoUrl}
                 alt={profile.name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-primary"
+                className="w-12 h-12 rounded-full object-cover border-2 border-secondary"
               />
             )}
             <div>
-              <Link to="/" className="text-2xl font-bold text-primary hover:opacity-80">
+              <Link 
+                to="/" 
+                className="text-2xl font-bold hover:opacity-80"
+                style={{ color: theme.secondary }}
+              >
                 {profile?.name || 'Portfólio Artístico'}
               </Link>
               {profile?.bio && (
@@ -74,7 +78,10 @@ function Header() {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
-                <button className="text-gray-600 hover:text-primary py-2">
+                <button 
+                  className="text-gray-600 transition-colors duration-150"
+                  style={{ '&:hover': { color: theme.primary } }}
+                >
                   Projetos
                 </button>
                 
@@ -96,7 +103,13 @@ function Header() {
                         <Link
                           key={project.id}
                           to={`/projeto/${project.id}`}
-                          className="block px-4 py-2 text-gray-700 hover:bg-primary hover:text-primary"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                          style={{
+                            '&:hover': {
+                              color: theme.primary,
+                              backgroundColor: `${theme.primary}10`
+                            }
+                          }}
                         >
                           <div className="font-medium">{project.title}</div>
                           {project.description && (
@@ -111,18 +124,27 @@ function Header() {
                 )}
               </div>
 
-              <Link to="/" className="text-gray-600 hover:text-primary">
+              <Link 
+                to="/" 
+                className="text-gray-600 transition-colors duration-150"
+                style={{ '&:hover': { color: theme.primary } }}
+              >
                 Galeria
               </Link>
               
               {user && (
                 <>
-                  <Link to="/admin" className="text-gray-600 hover:text-primary">
+                  <Link 
+                    to="/admin" 
+                    className="text-gray-600 transition-colors duration-150"
+                    style={{ '&:hover': { color: theme.primary } }}
+                  >
                     Admin
                   </Link>
                   <button
                     onClick={logout}
-                    className="text-gray-600 hover:text-primary"
+                    className="text-gray-600 transition-colors duration-150"
+                    style={{ '&:hover': { color: theme.primary } }}
                   >
                     Sair
                   </button>
