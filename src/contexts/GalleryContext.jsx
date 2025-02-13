@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { galleryService } from '../services/galleryService';
 
 const GalleryContext = createContext();
@@ -9,17 +9,18 @@ export function GalleryProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadGalleryData = async () => {
+  const loadGalleryData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Carrega as configurações
-      const gallerySettings = await galleryService.getSettings();
-      setSettings(gallerySettings);
-      
-      // Carrega as artworks
-      const artworksData = await galleryService.getArtworks();
+
+      // Carrega dados em paralelo
+      const [settingsData, artworksData] = await Promise.all([
+        galleryService.getSettings(),
+        galleryService.getArtworks()
+      ]);
+
+      setSettings(settingsData);
       setArtworks(artworksData);
     } catch (error) {
       console.error('Erro ao carregar dados da galeria:', error);
@@ -27,14 +28,12 @@ export function GalleryProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Carrega os dados iniciais
-  useEffect(() => {
-    loadGalleryData();
   }, []);
 
-  // Função para atualizar as configurações
+  useEffect(() => {
+    loadGalleryData();
+  }, [loadGalleryData]);
+
   const updateSettings = async (newSettings) => {
     try {
       await galleryService.updateSettings(newSettings);
@@ -46,24 +45,12 @@ export function GalleryProvider({ children }) {
     }
   };
 
-  // Função para atualizar as artworks
-  const updateArtworks = async () => {
-    try {
-      const artworksData = await galleryService.getArtworks();
-      setArtworks(artworksData);
-    } catch (error) {
-      console.error('Erro ao atualizar artworks:', error);
-      throw error;
-    }
-  };
-
   const value = {
     settings,
     artworks,
     loading,
     error,
     updateSettings,
-    updateArtworks,
     reloadGallery: loadGalleryData
   };
 

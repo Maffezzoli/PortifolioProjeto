@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import GalleryProvider from './contexts/GalleryContext';
@@ -22,9 +22,9 @@ function App() {
               <Header />
               <main className="page-container py-8">
                 <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
+                  <Route path="/" element={<Navigate to="/galeria" replace />} />
                   <Route path="/galeria" element={<Gallery />} />
+                  <Route path="/login" element={<Login />} />
                   <Route path="/projeto/:id" element={<ProjectDetails />} />
                   <Route
                     path="/admin"

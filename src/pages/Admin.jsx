@@ -60,9 +60,7 @@ function Admin() {
       <div className="flex border-b mb-6">
         <button
           className={`px-4 py-2 font-medium ${
-            activeTab === 'profile'
-              ? 'border-b-2 border-purple-600 text-purple-600'
-              : 'text-gray-600'
+            activeTab === 'profile' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
           }`}
           onClick={() => setActiveTab('profile')}
         >
@@ -70,9 +68,7 @@ function Admin() {
         </button>
         <button
           className={`px-4 py-2 font-medium ${
-            activeTab === 'projects'
-              ? 'border-b-2 border-purple-600 text-purple-600'
-              : 'text-gray-600'
+            activeTab === 'projects' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
           }`}
           onClick={() => setActiveTab('projects')}
         >
@@ -80,9 +76,7 @@ function Admin() {
         </button>
         <button
           className={`px-4 py-2 font-medium ${
-            activeTab === 'artworks'
-              ? 'border-b-2 border-purple-600 text-purple-600'
-              : 'text-gray-600'
+            activeTab === 'artworks' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
           }`}
           onClick={() => setActiveTab('artworks')}
         >
@@ -90,9 +84,7 @@ function Admin() {
         </button>
         <button
           className={`px-4 py-2 font-medium ${
-            activeTab === 'gallery'
-              ? 'border-b-2 border-purple-600 text-purple-600'
-              : 'text-gray-600'
+            activeTab === 'gallery' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
           }`}
           onClick={() => setActiveTab('gallery')}
         >
@@ -100,13 +92,11 @@ function Admin() {
         </button>
         <button
           className={`px-4 py-2 font-medium ${
-            activeTab === 'theme'
-              ? 'border-b-2 border-purple-600 text-purple-600'
-              : 'text-gray-600'
+            activeTab === 'theme' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
           }`}
           onClick={() => setActiveTab('theme')}
         >
-          Personalização
+          Tema
         </button>
       </div>
 

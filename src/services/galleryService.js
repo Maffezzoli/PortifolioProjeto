@@ -1,63 +1,64 @@
 import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
-const GALLERY_CONFIG_ID = 'settings';
-const COLLECTION_NAME = 'gallery_config';
+const GALLERY_CONFIG_DOC = 'gallery_settings';
 
 export const galleryService = {
   async getSettings() {
     try {
-      const docRef = doc(db, COLLECTION_NAME, GALLERY_CONFIG_ID);
+      const docRef = doc(db, 'gallery_config', GALLERY_CONFIG_DOC);
       const docSnap = await getDoc(docRef);
       
-      const defaultSettings = {
-        title: 'Minha Galeria de Arte',
-        description: 'Bem-vindo à minha galeria de arte digital',
-        categories: [
-          { id: 'all', name: 'Todas' },
-          { id: 'digital', name: 'Arte Digital' },
-          { id: 'illustration', name: 'Ilustração' }
-        ],
-        layout: 'grid', // grid ou masonry
-        itemsPerPage: 12
-      };
-
       if (!docSnap.exists()) {
+        const defaultSettings = {
+          title: 'Galeria da Nathália',
+          description: 'Artes feitas por mim',
+          categories: [
+            { id: 'all', name: 'Todas' },
+            { id: 'anatomy', name: 'Anatomia' },
+            { id: 'scenario', name: 'Cenário' },
+            { id: 'character', name: 'Personagens' }
+          ],
+          layout: 'grid',
+          itemsPerPage: 12,
+          showFilters: true,
+          sortBy: 'newest'
+        };
+        
         await this.updateSettings(defaultSettings);
         return defaultSettings;
       }
 
-      return { ...defaultSettings, ...docSnap.data() };
+      return docSnap.data();
     } catch (error) {
-      console.error('Erro ao carregar configurações da galeria:', error);
+      console.error('Erro ao carregar configurações:', error);
       throw error;
     }
   },
 
   async updateSettings(settings) {
     try {
-      const docRef = doc(db, COLLECTION_NAME, GALLERY_CONFIG_ID);
+      const docRef = doc(db, 'gallery_config', GALLERY_CONFIG_DOC);
       await setDoc(docRef, {
         ...settings,
         updatedAt: new Date().toISOString()
       });
       return true;
     } catch (error) {
-      console.error('Erro ao atualizar configurações da galeria:', error);
+      console.error('Erro ao atualizar configurações:', error);
       throw error;
     }
   },
 
   async getArtworks() {
     try {
-      const artworksRef = collection(db, 'artworks');
-      const snapshot = await getDocs(artworksRef);
-      return snapshot.docs.map(doc => ({
+      const querySnapshot = await getDocs(collection(db, 'artworks'));
+      return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
     } catch (error) {
-      console.error('Erro ao carregar obras de arte:', error);
+      console.error('Erro ao carregar artworks:', error);
       throw error;
     }
   }

@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { useGallery } from '../contexts/GalleryContext';
+import { useTheme } from '../contexts/ThemeContext';
 import ArtworkCard from '../components/ArtworkCard';
+import { useGallery } from '../contexts/GalleryContext';
 
 function Gallery() {
-  const { settings, artworks, loading, error } = useGallery();
+  const { artworks, loading, error, settings } = useGallery();
+  const { theme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   if (loading) {
@@ -29,34 +31,31 @@ function Gallery() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          {settings?.title || 'Galeria de Arte'}
+        <h1 className="text-3xl font-bold mb-4" style={{ color: theme.primary }}>
+          {settings?.title || 'Galeria da Nathália'}
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          {settings?.description || 'Bem-vindo à minha galeria de arte digital'}
+          {settings?.description || 'Artes feitas por mim'}
         </p>
       </div>
 
       <div className="flex justify-center gap-4 flex-wrap">
-        <button
-          onClick={() => setSelectedCategory('all')}
-          className={`px-4 py-2 rounded-full transition-colors ${
-            selectedCategory === 'all'
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 hover:bg-gray-200'
-          }`}
-        >
-          Todas
-        </button>
         {settings?.categories?.map(category => (
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-full transition-colors ${
+            className={`px-4 py-2 rounded-full transition-colors duration-200 ${
               selectedCategory === category.id
-                ? 'bg-primary text-white'
-                : 'bg-gray-100 hover:bg-gray-200'
+                ? 'text-white'
+                : 'text-gray-700 hover:text-white'
             }`}
+            style={{
+              backgroundColor: selectedCategory === category.id ? theme.primary : 'transparent',
+              border: `1px solid ${theme.primary}`,
+              '&:hover': {
+                backgroundColor: theme.primary
+              }
+            }}
           >
             {category.name}
           </button>

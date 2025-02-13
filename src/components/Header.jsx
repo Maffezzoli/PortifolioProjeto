@@ -125,7 +125,7 @@ function Header() {
               </div>
 
               <Link 
-                to="/" 
+                to="/galeria" 
                 className="text-gray-600 transition-colors duration-150"
                 style={{ '&:hover': { color: theme.primary } }}
               >
