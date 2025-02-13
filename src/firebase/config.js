@@ -1,22 +1,17 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  // Substitua com suas credenciais reais do Firebase
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto",
-  storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: "AIzaSyDVA06gQKUKyryw5UArB5Jpu6ycYh3e3_A",
+  authDomain: "portifolioweb-f0cb0.firebaseapp.com",
+  projectId: "portifolioweb-f0cb0",
+  messagingSenderId: "582514786183",
+  appId: "1:582514786183:web:f7af1757269eb6fff11d22",
+  measurementId: "G-5XCCS2BZG5"
 };
 
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
 // Inicializa o Firestore
-export const db = getFirestore(app);
-
-// Inicializa o Storage
-export const storage = getStorage(app); 
+export const db = getFirestore(app); 

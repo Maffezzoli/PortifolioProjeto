@@ -6,6 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 function Home() {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     const loadArtworks = async () => {
@@ -22,22 +23,49 @@ function Home() {
     loadArtworks();
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Galeria de Arte</h1>
-      {artworks.length === 0 ? (
-        <p className="text-center text-gray-600">Nenhuma arte encontrada.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {artworks.map((artwork) => (
+    <div className="max-w-[1400px] mx-auto">
+      {/* Hero Section */}
+      <div className="text-center mb-16">
+        <h1 className="text-5xl font-bold text-gray-800 mb-4">
+          Galeria de Arte
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Explore nossa coleção de obras de arte únicas e inspiradoras
+        </p>
+      </div>
+
+      {/* Categories */}
+      <div className="flex justify-center gap-8 mb-12">
+        {['all', 'digital', 'traditional', 'photography'].map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`text-lg font-medium px-4 py-2 rounded-lg transition-all ${
+              selectedCategory === category
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:text-blue-600'
+            }`}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Gallery Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        {artworks.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-xl text-gray-600">Nenhuma arte encontrada.</p>
+          </div>
+        ) : (
+          artworks.map((artwork) => (
             <ArtworkCard key={artwork.id} artwork={artwork} />
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

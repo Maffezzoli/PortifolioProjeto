@@ -1,15 +1,13 @@
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from './config';
+import { db } from './config';
+import { uploadImage } from '../services/imageService';
 
 export const artworkService = {
   // Adicionar nova arte
   async addArtwork(artwork, imageFile) {
     try {
-      // Upload da imagem para o Storage
-      const storageRef = ref(storage, `artworks/${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const imageUrl = await getDownloadURL(storageRef);
+      // Upload da imagem para o serviço de hospedagem
+      const imageUrl = await uploadImage(imageFile);
 
       // Adicionar documento ao Firestore
       const docRef = await addDoc(collection(db, 'artworks'), {
@@ -42,10 +40,6 @@ export const artworkService = {
   // Deletar uma arte
   async deleteArtwork(id, imageUrl) {
     try {
-      // Deletar imagem do Storage
-      const imageRef = ref(storage, imageUrl);
-      await deleteObject(imageRef);
-
       // Deletar documento do Firestore
       await deleteDoc(doc(db, 'artworks', id));
     } catch (error) {
@@ -61,9 +55,7 @@ export const artworkService = {
 
       if (newImageFile) {
         // Upload da nova imagem
-        const storageRef = ref(storage, `artworks/${newImageFile.name}`);
-        await uploadBytes(storageRef, newImageFile);
-        imageUrl = await getDownloadURL(storageRef);
+        const imageUrl = await uploadImage(newImageFile);
       }
 
       // Atualizar documento no Firestore
