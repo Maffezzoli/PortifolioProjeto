@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import ProjectDetails from './pages/ProjectDetails';
 import Gallery from './pages/Gallery';
 import ProtectedRoute from './components/ProtectedRoute';
+import DynamicFavicon from './components/DynamicFavicon';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <ThemeProvider>
         <GalleryProvider>
           <Router>
+            <DynamicFavicon />
             <div className="min-h-screen" style={{ 
               background: `linear-gradient(to bottom, ${getComputedStyle(document.documentElement).getPropertyValue('--color-background')}, ${getComputedStyle(document.documentElement).getPropertyValue('--color-accent')}10)`
             }}>
