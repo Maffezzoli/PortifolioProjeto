@@ -6,57 +6,69 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
       await login(email, password);
       navigate('/admin');
     } catch (error) {
-      setError('Falha no login. Verifique suas credenciais.');
+      console.error('Erro no login:', error);
+      setError('Erro ao fazer login. Verifique suas credenciais.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Login</h2>
+    <div className="max-w-md mx-auto mt-8">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
+        
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <div className="bg-red-100 text-red-700 p-3 rounded">
             {error}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-300"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-300"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            Entrar
-          </button>
-        </form>
-      </div>
+
+        <div>
+          <label className="block text-gray-700 mb-2">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 mb-2">Senha</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full bg-primary text-white py-2 rounded-lg hover:opacity-90 transition-opacity ${
+            loading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          {loading ? 'Entrando...' : 'Entrar'}
+        </button>
+      </form>
     </div>
   );
 }

@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ArtworkForm from '../components/ArtworkForm';
 import ProfileEditor from '../components/ProfileEditor';
 import ProjectForm from '../components/ProjectForm';
 import ProjectList from '../components/ProjectList';
 import ArtworkList from '../components/ArtworkList';
 import { useProjects } from '../hooks/useProjects';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../contexts/AuthContext';
 import { projectService } from '../services/projectService';
 import ThemeEditor from '../components/ThemeEditor';
 import GalleryEditor from '../components/GalleryEditor';
+import GallerySettings from '../components/GallerySettings';
+import { userService } from '../services/userService';
 
 function Admin() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -16,15 +18,19 @@ function Admin() {
   const [editingArtwork, setEditingArtwork] = useState(null);
   const [projectsKey, setProjectsKey] = useState(0);
   const { reloadProjects } = useProjects();
-  const { user, loading } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [loadingEdit, setLoadingEdit] = useState(false);
 
-  if (loading) {
+  if (loadingEdit) {
     return <div>Carregando...</div>;
   }
 
-  if (!user) {
-    return <div>Você precisa estar autenticado para acessar esta página</div>;
+  if (!isAdmin) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600">Você não tem permissão para acessar esta página.</p>
+      </div>
+    );
   }
 
   const handleProjectSuccess = () => {
@@ -177,7 +183,7 @@ function Admin() {
         </div>
       )}
 
-      {activeTab === 'gallery' && <GalleryEditor />}
+      {activeTab === 'gallery' && <GallerySettings />}
 
       {activeTab === 'theme' && <ThemeEditor />}
     </div>

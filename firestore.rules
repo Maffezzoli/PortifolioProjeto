@@ -12,11 +12,16 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Regras para projetos
-    match /projects/{projectId} {
-      allow read: if true; // Qualquer um pode ler
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+    // Regras para galeria
+    match /gallery/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Regras para configurações da galeria
+    match /gallery_config/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // Regras para artworks
@@ -25,10 +30,18 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
+    // Regras para projetos
+    match /projects/{projectId} {
+      allow read: if true; // Qualquer um pode ler
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
     // Regras para usuários
     match /users/{userId} {
-      allow read: if true;
+      allow read: if isAuthenticated();
       allow write: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if isAuthenticated();
     }
 
     match /profile/{document} {
@@ -38,12 +51,6 @@ service cloud.firestore {
 
     // Regras para tema
     match /theme/{document} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    // Regras para configurações da galeria
-    match /gallery_config/{document} {
       allow read: if true;
       allow write: if request.auth != null;
     }

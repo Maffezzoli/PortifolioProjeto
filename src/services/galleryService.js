@@ -1,64 +1,63 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
-const GALLERY_CONFIG_ID = 'main';
+const GALLERY_CONFIG_ID = 'settings';
 const COLLECTION_NAME = 'gallery_config';
 
 export const galleryService = {
-  async getConfig() {
+  async getSettings() {
     try {
       const docRef = doc(db, COLLECTION_NAME, GALLERY_CONFIG_ID);
       const docSnap = await getDoc(docRef);
       
-      if (!docSnap.exists()) {
-        const defaultConfig = {
-          title: 'Galeria de Arte',
-          description: 'Explore minha coleção de obras de arte',
-          categories: [
-            { id: 'digital', name: 'Arte Digital' },
-            { id: 'traditional', name: 'Arte Tradicional' },
-            { id: 'illustration', name: 'Ilustração' },
-          ]
-        };
-
-        // Salva a configuração padrão
-        await this.updateConfig(defaultConfig);
-        return defaultConfig;
-      }
-      
-      const data = docSnap.data();
-      console.log('Configurações carregadas do Firestore:', data);
-      
-      // Garante que temos todas as propriedades necessárias
-      return {
-        title: data.title || 'Galeria de Arte',
-        description: data.description || 'Explore minha coleção de obras de arte',
-        categories: Array.isArray(data.categories) ? data.categories : []
+      const defaultSettings = {
+        title: 'Minha Galeria de Arte',
+        description: 'Bem-vindo à minha galeria de arte digital',
+        categories: [
+          { id: 'all', name: 'Todas' },
+          { id: 'digital', name: 'Arte Digital' },
+          { id: 'illustration', name: 'Ilustração' }
+        ],
+        layout: 'grid', // grid ou masonry
+        itemsPerPage: 12
       };
+
+      if (!docSnap.exists()) {
+        await this.updateSettings(defaultSettings);
+        return defaultSettings;
+      }
+
+      return { ...defaultSettings, ...docSnap.data() };
     } catch (error) {
-      console.error('Erro ao carregar configurações:', error);
+      console.error('Erro ao carregar configurações da galeria:', error);
       throw error;
     }
   },
 
-  async updateConfig(config) {
+  async updateSettings(settings) {
     try {
-      // Validação dos dados antes de salvar
-      if (!config || typeof config !== 'object') {
-        throw new Error('Configuração inválida');
-      }
-
       const docRef = doc(db, COLLECTION_NAME, GALLERY_CONFIG_ID);
       await setDoc(docRef, {
-        title: config.title || '',
-        description: config.description || '',
-        categories: Array.isArray(config.categories) ? config.categories : [],
+        ...settings,
         updatedAt: new Date().toISOString()
       });
-
-      console.log('Configurações atualizadas com sucesso:', config);
+      return true;
     } catch (error) {
-      console.error('Erro ao atualizar configurações:', error);
+      console.error('Erro ao atualizar configurações da galeria:', error);
+      throw error;
+    }
+  },
+
+  async getArtworks() {
+    try {
+      const artworksRef = collection(db, 'artworks');
+      const snapshot = await getDocs(artworksRef);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('Erro ao carregar obras de arte:', error);
       throw error;
     }
   }

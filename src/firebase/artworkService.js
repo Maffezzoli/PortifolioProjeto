@@ -1,5 +1,6 @@
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from './config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './config';
 import { uploadImage } from '../services/imageService';
 
 export const artworkService = {
@@ -66,6 +67,55 @@ export const artworkService = {
       });
     } catch (error) {
       console.error('Erro ao atualizar artwork:', error);
+      throw error;
+    }
+  },
+
+  async createArtwork(artworkData, imageFile) {
+    try {
+      // Upload da imagem
+      const storageRef = ref(storage, `artworks/${Date.now()}_${imageFile.name}`);
+      const snapshot = await uploadBytes(storageRef, imageFile);
+      const imageUrl = await getDownloadURL(snapshot.ref);
+
+      // Salva no Firestore
+      const docRef = await addDoc(collection(db, 'artworks'), {
+        ...artworkData,
+        imageUrl,
+        createdAt: new Date().toISOString()
+      });
+
+      return {
+        id: docRef.id,
+        ...artworkData,
+        imageUrl
+      };
+    } catch (error) {
+      console.error('Erro ao criar artwork:', error);
+      throw error;
+    }
+  },
+
+  async updateArtwork(id, artworkData) {
+    try {
+      const artworkRef = doc(db, 'artworks', id);
+      await updateDoc(artworkRef, {
+        ...artworkData,
+        updatedAt: new Date().toISOString()
+      });
+      return true;
+    } catch (error) {
+      console.error('Erro ao atualizar artwork:', error);
+      throw error;
+    }
+  },
+
+  async deleteArtwork(id) {
+    try {
+      await deleteDoc(doc(db, 'artworks', id));
+      return true;
+    } catch (error) {
+      console.error('Erro ao deletar artwork:', error);
       throw error;
     }
   }

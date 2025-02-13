@@ -8,7 +8,7 @@ import { useTheme } from '../contexts/ThemeContext';
 function Header() {
   const { profile } = useProfile();
   const { projects, loading, error } = useProjects();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -182,6 +182,11 @@ function Header() {
           </div>
         </div>
       </div>
+      {isAdmin && (
+        <span className="ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+          Admin
+        </span>
+      )}
     </header>
   );
 }

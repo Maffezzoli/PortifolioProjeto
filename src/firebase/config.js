@@ -35,4 +35,6 @@ export const getCurrentUser = () => {
 };
 
 // Exporta todas as instâncias necessárias
-export { db, auth, storage }; 
+export { db, auth, storage };
+
+export default app; 

@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useGallery } from '../contexts/GalleryContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import ProjectCard from './ProjectCard';
 
-function GalleryEditor() {
-  const { settings, updateSettings } = useGallery();
+function GallerySettings() {
+  const { settings, updateSettings, reloadGallery } = useGallery();
   const { theme } = useTheme();
-  const [formData, setFormData] = useState(settings || {});
+  const { isAdmin } = useAuth();
+  const [formData, setFormData] = useState(settings || {
+    title: '',
+    description: '',
+    categories: []
+  });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [newCategory, setNewCategory] = useState({ id: '', name: '' });
@@ -24,6 +30,7 @@ function GalleryEditor() {
 
     try {
       await updateSettings(formData);
+      await reloadGallery();
       setMessage('Configurações atualizadas com sucesso!');
     } catch (error) {
       setMessage('Erro ao salvar configurações: ' + error.message);
@@ -49,10 +56,26 @@ function GalleryEditor() {
     }));
   };
 
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-red-600">Você precisa ser administrador para acessar esta página.</p>
+      </div>
+    );
+  }
+
+  if (!settings) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-gray-600">Carregando configurações da galeria...</p>
+      </div>
+    );
+  }
+
   return (
     <ProjectCard>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <h2 className="text-2xl font-bold" style={{ color: theme.primary }}>
+        <h2 className="text-2xl font-bold text-primary">
           Configurações da Galeria
         </h2>
 
@@ -72,6 +95,7 @@ function GalleryEditor() {
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               className="w-full px-4 py-2 border rounded-lg"
+              required
             />
           </div>
 
@@ -82,6 +106,7 @@ function GalleryEditor() {
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="w-full px-4 py-2 border rounded-lg"
               rows={3}
+              required
             />
           </div>
 
@@ -105,6 +130,7 @@ function GalleryEditor() {
                     type="button"
                     onClick={() => handleRemoveCategory(category.id)}
                     className="text-red-500 hover:text-red-700"
+                    disabled={category.id === 'all'}
                   >
                     Remover
                   </button>
@@ -142,11 +168,7 @@ function GalleryEditor() {
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2 text-white rounded-lg transition-colors"
-            style={{ 
-              backgroundColor: theme.primary,
-              opacity: saving ? 0.5 : 1
-            }}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {saving ? 'Salvando...' : 'Salvar Configurações'}
           </button>
@@ -156,4 +178,4 @@ function GalleryEditor() {
   );
 }
 
-export default GalleryEditor; 
+export default GallerySettings; 
