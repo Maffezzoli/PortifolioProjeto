@@ -7,6 +7,7 @@ import ArtworkList from '../components/ArtworkList';
 import { useProjects } from '../hooks/useProjects';
 import { useAuth } from '../hooks/useAuth';
 import { projectService } from '../services/projectService';
+import ThemeEditor from '../components/ThemeEditor';
 
 function Admin() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -79,6 +80,16 @@ function Admin() {
           onClick={() => setActiveTab('artworks')}
         >
           Galeria
+        </button>
+        <button
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'theme'
+              ? 'border-b-2 border-purple-600 text-purple-600'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('theme')}
+        >
+          Personalização
         </button>
       </div>
 
@@ -154,6 +165,8 @@ function Admin() {
           />
         </div>
       )}
+
+      {activeTab === 'theme' && <ThemeEditor />}
     </div>
   );
 }
