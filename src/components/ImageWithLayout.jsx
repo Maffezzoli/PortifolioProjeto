@@ -1,11 +1,10 @@
-import ProjectCard from './ProjectCard';
 import TextStyled from './TextStyled';
 
 function ImageWithLayout({ image, textStyle }) {
   const layoutClasses = {
-    full: "w-full",
-    left: "float-left mr-8 w-[300px] md:w-[400px]",
-    right: "float-right ml-8 w-[300px] md:w-[400px]"
+    full: "w-full bg-white rounded-lg shadow-sm",
+    left: "w-[300px] md:w-[400px]",
+    right: "w-[300px] md:w-[400px]"
   };
 
   const spacingClasses = {
@@ -16,17 +15,29 @@ function ImageWithLayout({ image, textStyle }) {
 
   const wrapperClasses = {
     full: "",
-    left: "overflow-auto",
-    right: "overflow-auto"
+    left: "flex flex-wrap md:flex-nowrap items-start gap-8 max-w-full",
+    right: "flex flex-wrap md:flex-nowrap flex-row-reverse items-start gap-8 max-w-full"
+  };
+
+  const contentClasses = {
+    full: "w-full",
+    left: "flex-1 min-w-0 w-full md:w-auto break-words overflow-hidden",
+    right: "flex-1 min-w-0 w-full md:w-auto break-words overflow-hidden"
+  };
+
+  const imageContainerClasses = {
+    full: "w-full",
+    left: "w-full md:w-[300px] lg:w-[400px] flex-shrink-0",
+    right: "w-full md:w-[300px] lg:w-[400px] flex-shrink-0"
   };
 
   const imageContent = (
-    <figure className={layoutClasses[image.layout]}>
+    <figure className={imageContainerClasses[image.layout]}>
       <div className={`${image.layout === 'full' ? 'aspect-w-16 aspect-h-9' : 'aspect-w-4 aspect-h-3'} mb-2`}>
         <img
           src={image.url}
           alt={image.description}
-          className="rounded-lg shadow-lg object-cover w-full h-full"
+          className={`object-cover w-full h-full ${image.layout === 'full' ? 'rounded-lg' : 'rounded-lg shadow-lg'}`}
         />
       </div>
       {image.description && (
@@ -39,9 +50,9 @@ function ImageWithLayout({ image, textStyle }) {
 
   if (image.layout === 'full') {
     return (
-      <ProjectCard className={spacingClasses[image.spacing || 'normal']}>
+      <div className={spacingClasses[image.spacing || 'normal']}>
         {imageContent}
-      </ProjectCard>
+      </div>
     );
   }
 
@@ -49,9 +60,11 @@ function ImageWithLayout({ image, textStyle }) {
     <div className={`${wrapperClasses[image.layout]} ${spacingClasses[image.spacing || 'normal']}`}>
       {imageContent}
       {image.content && (
-        <TextStyled type="content" customStyle={textStyle}>
-          {image.content}
-        </TextStyled>
+        <div className={contentClasses[image.layout]}>
+          <TextStyled type="content" customStyle={textStyle}>
+            {image.content}
+          </TextStyled>
+        </div>
       )}
     </div>
   );
