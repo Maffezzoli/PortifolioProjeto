@@ -1,6 +1,45 @@
+import { useEffect, useState } from 'react';
 import ImageWithLayout from './ImageWithLayout';
 
-function ProjectPreview({ project }) {
+function ProjectPreview({ project, coverImage, projectImages }) {
+  const [imageUrls, setImageUrls] = useState({
+    cover: null,
+    images: []
+  });
+
+  useEffect(() => {
+    // Criar URLs temporárias para as imagens
+    const createImageUrls = () => {
+      // URL para imagem de capa
+      const coverUrl = coverImage ? URL.createObjectURL(coverImage) : project.coverUrl;
+
+      // URLs para imagens adicionais
+      const urls = project.images.map((img, index) => ({
+        ...img,
+        url: img.file ? URL.createObjectURL(img.file) : img.url
+      }));
+
+      setImageUrls({
+        cover: coverUrl,
+        images: urls
+      });
+    };
+
+    createImageUrls();
+
+    // Limpar URLs temporárias quando o componente for desmontado
+    return () => {
+      if (imageUrls.cover && imageUrls.cover.startsWith('blob:')) {
+        URL.revokeObjectURL(imageUrls.cover);
+      }
+      imageUrls.images.forEach(img => {
+        if (img.url && img.url.startsWith('blob:')) {
+          URL.revokeObjectURL(img.url);
+        }
+      });
+    };
+  }, [project, coverImage]);
+
   const textStyleClasses = {
     fontSize: {
       normal: 'text-base',
@@ -35,10 +74,10 @@ function ProjectPreview({ project }) {
         </div>
 
         {/* Imagem de Capa */}
-        {project.coverUrl && (
+        {imageUrls.cover && (
           <div className="mb-8">
             <img
-              src={project.coverUrl}
+              src={imageUrls.cover}
               alt={project.title}
               className="w-full h-auto rounded-lg shadow-lg"
             />
@@ -47,14 +86,18 @@ function ProjectPreview({ project }) {
 
         {/* Conteúdo do Projeto com Imagens */}
         <div className="prose max-w-none">
-          <div className="relative flow-root">
+          <div className="relative">
             <div className={`whitespace-pre-wrap text-gray-700 ${textClasses}`}>
               {project.content}
             </div>
 
             {/* Imagens Adicionais */}
-            {project.images?.map((image, index) => (
-              <ImageWithLayout key={index} image={image} />
+            {imageUrls.images.map((image, index) => (
+              <ImageWithLayout 
+                key={index} 
+                image={image} 
+                textStyle={project.textStyle}
+              />
             ))}
           </div>
         </div>

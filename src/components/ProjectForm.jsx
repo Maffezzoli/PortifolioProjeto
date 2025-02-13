@@ -12,7 +12,8 @@ function ProjectForm({ onSuccess }) {
       fontSize: 'normal', // normal, large, xl
       alignment: 'left', // left, center, justify
       fontFamily: 'sans' // sans, serif, mono
-    }
+    },
+    spacing: 'normal' // novo campo para espaçamento
   });
   const [coverImage, setCoverImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +59,7 @@ function ProjectForm({ onSuccess }) {
 
     try {
       await projectService.addProject(project, coverImage);
-      setProject({ title: '', description: '', content: '', images: [], textStyle: { fontSize: 'normal', alignment: 'left', fontFamily: 'sans' } });
+      setProject({ title: '', description: '', content: '', images: [], textStyle: { fontSize: 'normal', alignment: 'left', fontFamily: 'sans' }, spacing: 'normal' });
       setCoverImage(null);
       onSuccess?.();
     } catch (error) {
@@ -82,7 +83,10 @@ function ProjectForm({ onSuccess }) {
       </div>
 
       {showPreview ? (
-        <ProjectPreview project={{ ...project, coverUrl: coverImage ? URL.createObjectURL(coverImage) : null }} />
+        <ProjectPreview 
+          project={project}
+          coverImage={coverImage}
+        />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -181,17 +185,47 @@ function ProjectForm({ onSuccess }) {
                   />
                 </div>
 
-                <div>
-                  <select
-                    value={image.layout}
-                    onChange={(e) => handleImageChange(index, 'layout', e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg"
-                  >
-                    <option value="full">Largura Total</option>
-                    <option value="left">Lateral Esquerda</option>
-                    <option value="right">Lateral Direita</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-700 mb-2">Layout</label>
+                    <select
+                      value={image.layout}
+                      onChange={(e) => handleImageChange(index, 'layout', e.target.value)}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    >
+                      <option value="full">Largura Total</option>
+                      <option value="left">Lateral Esquerda</option>
+                      <option value="right">Lateral Direita</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 mb-2">Espaçamento</label>
+                    <select
+                      value={image.spacing || 'normal'}
+                      onChange={(e) => handleImageChange(index, 'spacing', e.target.value)}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    >
+                      <option value="tight">Compacto</option>
+                      <option value="normal">Normal</option>
+                      <option value="loose">Espaçado</option>
+                    </select>
+                  </div>
                 </div>
+
+                {/* Campo de texto associado à imagem - só aparece para layouts laterais */}
+                {image.layout !== 'full' && (
+                  <div>
+                    <label className="block text-gray-700 mb-2">Texto Associado</label>
+                    <textarea
+                      value={image.content || ''}
+                      onChange={(e) => handleImageChange(index, 'content', e.target.value)}
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-300"
+                      rows="4"
+                      placeholder="Digite o texto que aparecerá ao lado da imagem..."
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
