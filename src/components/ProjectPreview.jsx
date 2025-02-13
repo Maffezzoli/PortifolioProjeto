@@ -30,35 +30,37 @@ function ProjectPreview({ project, coverImage }) {
   }, [project.images]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
       <ProjectCard>
-        <TextStyled type="title">{project.title}</TextStyled>
-        <TextStyled type="subtitle" className="mt-2">{project.description}</TextStyled>
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <TextStyled type="title">{project.title}</TextStyled>
+            <TextStyled type="subtitle">{project.description}</TextStyled>
+          </div>
 
-        {(coverImage || project.coverUrl) && (
-          <div className="mt-6">
+          {(coverImage || project.coverUrl) && (
             <img
               src={coverImage ? URL.createObjectURL(coverImage) : project.coverUrl}
               alt={project.title}
               className="w-full h-auto rounded-lg shadow-lg"
             />
-          </div>
-        )}
+          )}
+
+          <TextStyled type="content" customStyle={project.textStyle}>
+            {project.content}
+          </TextStyled>
+        </div>
       </ProjectCard>
 
-      <ProjectCard>
-        <TextStyled type="content" customStyle={project.textStyle}>
-          {project.content}
-        </TextStyled>
-      </ProjectCard>
-
-      {previewImages.map((image, index) => (
-        <ImageWithLayout 
-          key={index} 
-          image={image} 
-          textStyle={project.textStyle}
-        />
-      ))}
+      <div className="space-y-12">
+        {previewImages.map((image, index) => (
+          <ImageWithLayout 
+            key={index} 
+            image={image} 
+            textStyle={project.textStyle}
+          />
+        ))}
+      </div>
     </div>
   );
 }

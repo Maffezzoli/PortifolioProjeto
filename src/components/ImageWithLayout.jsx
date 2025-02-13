@@ -9,8 +9,8 @@ function ImageWithLayout({ image, textStyle }) {
   };
 
   const spacingClasses = {
-    tight: "mb-4",
-    normal: "mb-8",
+    tight: "mb-8",
+    normal: "mb-12",
     loose: "mb-16"
   };
 
@@ -38,7 +38,7 @@ function ImageWithLayout({ image, textStyle }) {
         <img
           src={image.url}
           alt={image.description}
-          className={`object-cover w-full h-full ${image.layout === 'full' ? 'rounded-lg' : 'rounded-lg shadow-lg'}`}
+          className={`object-cover w-full h-full rounded-lg shadow-lg`}
         />
       </div>
       {image.description && (
@@ -58,16 +58,18 @@ function ImageWithLayout({ image, textStyle }) {
   }
 
   return (
-    <div className={`${wrapperClasses[image.layout]} ${spacingClasses[image.spacing || 'normal']}`}>
-      {imageContent}
-      {image.content && (
-        <div className={contentClasses[image.layout]}>
-          <TextStyled type="content" customStyle={textStyle}>
-            {image.content}
-          </TextStyled>
-        </div>
-      )}
-    </div>
+    <ProjectCard className={spacingClasses[image.spacing || 'normal']}>
+      <div className={wrapperClasses[image.layout]}>
+        {imageContent}
+        {image.content && (
+          <div className={contentClasses[image.layout]}>
+            <TextStyled type="content" customStyle={textStyle}>
+              {image.content}
+            </TextStyled>
+          </div>
+        )}
+      </div>
+    </ProjectCard>
   );
 }
 

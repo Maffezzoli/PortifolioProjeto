@@ -55,45 +55,44 @@ function ProjectDetails() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <ProjectCard>
-        {/* Cabeçalho do Projeto */}
-        <TextStyled type="title">{project.title}</TextStyled>
-        <TextStyled type="subtitle" className="mt-2">{project.description}</TextStyled>
+      <div className="space-y-16">
+        <ProjectCard>
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <TextStyled type="title">{project.title}</TextStyled>
+              <TextStyled type="subtitle">{project.description}</TextStyled>
+            </div>
 
-        {/* Imagem de Capa */}
-        {project.coverUrl && (
-          <div className="mt-6">
-            <img
-              src={project.coverUrl}
-              alt={project.title}
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
+            {project.coverUrl && (
+              <img
+                src={project.coverUrl}
+                alt={project.title}
+                className="w-full h-auto rounded-lg shadow-lg"
+              />
+            )}
+
+            <TextStyled type="content" customStyle={project.textStyle}>
+              {project.content}
+            </TextStyled>
           </div>
-        )}
-      </ProjectCard>
+        </ProjectCard>
 
-      {/* Conteúdo do Projeto */}
-      <ProjectCard>
-        <TextStyled type="content" customStyle={project.textStyle}>
-          {project.content}
+        <div className="space-y-12">
+          {project.images?.map((image, index) => (
+            <ImageWithLayout 
+              key={index} 
+              image={image} 
+              textStyle={project.textStyle}
+            />
+          ))}
+        </div>
+
+        <TextStyled type="caption" className="text-center">
+          Criado em: {project.createdAt instanceof Date 
+            ? project.createdAt.toLocaleDateString()
+            : new Date(project.createdAt).toLocaleDateString()}
         </TextStyled>
-      </ProjectCard>
-
-      {/* Imagens Adicionais */}
-      {project.images?.map((image, index) => (
-        <ImageWithLayout 
-          key={index} 
-          image={image} 
-          textStyle={project.textStyle}
-        />
-      ))}
-
-      {/* Data de Criação */}
-      <TextStyled type="caption" className="mt-8">
-        Criado em: {project.createdAt instanceof Date 
-          ? project.createdAt.toLocaleDateString()
-          : new Date(project.createdAt).toLocaleDateString()}
-      </TextStyled>
+      </div>
     </div>
   );
 }
