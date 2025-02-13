@@ -4,26 +4,46 @@ import ProjectPreview from './ProjectPreview';
 import { auth } from '../firebase/config';
 
 function ProjectForm({ project: initialProject, onSuccess }) {
-  const [project, setProject] = useState(
-    initialProject ? {
-      ...initialProject,
-      images: initialProject.images.map(img => ({
-        ...img,
-        file: null // Resetar o arquivo para não tentar fazer upload novamente
-      }))
-    } : {
-      title: '',
-      description: '',
-      content: '',
-      images: [],
-      textStyle: {
-        fontSize: 'normal', // normal, large, xl
-        alignment: 'left', // left, center, justify
-        fontFamily: 'sans' // sans, serif, mono
-      },
-      spacing: 'normal' // novo campo para espaçamento
+  const [project, setProject] = useState(() => {
+    if (!initialProject) {
+      return {
+        title: '',
+        description: '',
+        content: '',
+        images: [],
+        textStyle: {
+          fontSize: 'normal',
+          alignment: 'left',
+          fontFamily: 'sans'
+        },
+        spacing: 'normal'
+      };
     }
-  );
+
+    // Se temos um projeto inicial, mantemos todos os dados existentes
+    return {
+      ...initialProject,
+      // Garantimos que as imagens tenham a estrutura correta
+      images: initialProject.images?.map(img => ({
+        ...img,
+        file: null, // Resetamos o arquivo para não tentar fazer upload novamente
+        url: img.url || '',
+        description: img.description || '',
+        layout: img.layout || 'full',
+        spacing: img.spacing || 'normal',
+        content: img.content || ''
+      })) || [],
+      // Garantimos que o textStyle tenha todos os campos necessários
+      textStyle: {
+        fontSize: initialProject.textStyle?.fontSize || 'normal',
+        alignment: initialProject.textStyle?.alignment || 'left',
+        fontFamily: initialProject.textStyle?.fontFamily || 'sans'
+      },
+      // Outros campos com valores padrão se necessário
+      spacing: initialProject.spacing || 'normal'
+    };
+  });
+
   const [coverImage, setCoverImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -86,23 +106,9 @@ function ProjectForm({ project: initialProject, onSuccess }) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end space-x-4">
-        <button
-          type="button"
-          onClick={() => setShowPreview(!showPreview)}
-          className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200"
-        >
-          {showPreview ? 'Voltar para Edição' : 'Visualizar'}
-        </button>
-      </div>
-
-      {showPreview ? (
-        <ProjectPreview 
-          project={project}
-          coverImage={coverImage}
-        />
-      ) : (
+    <div className="flex gap-8">
+      {/* Lado Esquerdo - Formulário */}
+      <div className="w-1/2 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-100 text-red-700 p-3 rounded">
@@ -141,6 +147,9 @@ function ProjectForm({ project: initialProject, onSuccess }) {
                   alt="Capa atual"
                   className="w-40 h-40 object-cover rounded"
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                  Imagem atual - selecione uma nova para substituir
+                </p>
               </div>
             )}
             <input
@@ -148,7 +157,7 @@ function ProjectForm({ project: initialProject, onSuccess }) {
               onChange={(e) => setCoverImage(e.target.files[0])}
               className="w-full"
               accept="image/*"
-              required={!initialProject}
+              required={!initialProject?.coverUrl}
             />
           </div>
 
@@ -315,7 +324,18 @@ function ProjectForm({ project: initialProject, onSuccess }) {
             {loading ? 'Salvando...' : initialProject ? 'Salvar Alterações' : 'Criar Projeto'}
           </button>
         </form>
-      )}
+      </div>
+
+      {/* Lado Direito - Preview */}
+      <div className="w-1/2 sticky top-4 h-[calc(100vh-2rem)] overflow-auto">
+        <div className="bg-gray-50 rounded-lg p-4">
+          <h3 className="text-lg font-medium text-gray-700 mb-4">Visualização em Tempo Real</h3>
+          <ProjectPreview 
+            project={project}
+            coverImage={coverImage}
+          />
+        </div>
+      </div>
     </div>
   );
 }

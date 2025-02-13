@@ -1,4 +1,5 @@
 import TextStyled from './TextStyled';
+import ProjectCard from './ProjectCard';
 
 function ImageWithLayout({ image, textStyle }) {
   const layoutClasses = {
@@ -50,9 +51,9 @@ function ImageWithLayout({ image, textStyle }) {
 
   if (image.layout === 'full') {
     return (
-      <div className={spacingClasses[image.spacing || 'normal']}>
+      <ProjectCard className={spacingClasses[image.spacing || 'normal']}>
         {imageContent}
-      </div>
+      </ProjectCard>
     );
   }
 

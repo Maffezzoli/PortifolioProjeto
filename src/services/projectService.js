@@ -106,33 +106,94 @@ export const projectService = {
     };
   },
 
-  async updateProject(id, project, newCoverImage) {
+  async getProjectForEdit(id) {
     const docRef = doc(db, COLLECTION_NAME, id);
-    const updateData = { ...project };
-
-    if (newCoverImage) {
-      const coverImageData = await uploadToCloudinary(newCoverImage);
-      updateData.coverUrl = coverImageData.url;
-      updateData.coverPublicId = coverImageData.publicId;
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) {
+      throw new Error('Projeto não encontrado');
     }
 
-    const imagePromises = project.images.map(async (img) => {
-      if (img.file) {
-        const imageData = await uploadToCloudinary(img.file);
+    const data = docSnap.data();
+
+    // Garantimos que todos os campos existam com valores padrão
+    const project = {
+      id: docSnap.id,
+      title: data.title || '',
+      description: data.description || '',
+      content: data.content || '',
+      coverUrl: data.coverUrl || '',
+      coverPublicId: data.coverPublicId || '',
+      images: (data.images || []).map(img => ({
+        ...img,
+        file: null,
+        url: img.url || '',
+        publicId: img.publicId || '',
+        description: img.description || '',
+        layout: img.layout || 'full',
+        spacing: img.spacing || 'normal',
+        content: img.content || ''
+      })),
+      textStyle: {
+        fontSize: data.textStyle?.fontSize || 'normal',
+        alignment: data.textStyle?.alignment || 'left',
+        fontFamily: data.textStyle?.fontFamily || 'sans'
+      },
+      spacing: data.spacing || 'normal',
+      createdAt: data.createdAt?.toDate() || new Date(data.createdAt),
+      userId: data.userId || auth.currentUser?.uid
+    };
+
+    console.log('Projeto carregado para edição:', project); // Debug
+    return project;
+  },
+
+  async updateProject(id, project, newCoverImage) {
+    const user = checkAuth();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const oldProject = await getDoc(docRef);
+    const updateData = { ...project };
+
+    try {
+      if (newCoverImage) {
+        const coverImageData = await uploadToCloudinary(newCoverImage);
+        updateData.coverUrl = coverImageData.url;
+        updateData.coverPublicId = coverImageData.publicId;
+      } else {
+        // Mantém a imagem de capa existente
+        updateData.coverUrl = oldProject.data().coverUrl;
+        updateData.coverPublicId = oldProject.data().coverPublicId;
+      }
+
+      const imagePromises = project.images.map(async (img) => {
+        if (img.file) {
+          const imageData = await uploadToCloudinary(img.file);
+          return {
+            ...img,
+            url: imageData.url,
+            publicId: imageData.publicId,
+            file: null
+          };
+        }
         return {
           ...img,
-          url: imageData.url,
-          publicId: imageData.publicId,
-          file: null
+          file: null // Garante que o campo file seja sempre null no banco
         };
-      }
-      return img;
-    });
+      });
 
-    const uploadedImages = await Promise.all(imagePromises);
-    updateData.images = uploadedImages;
+      const uploadedImages = await Promise.all(imagePromises);
+      updateData.images = uploadedImages;
 
-    await updateDoc(docRef, updateData);
+      // Mantém os metadados importantes
+      updateData.userId = user.uid;
+      updateData.updatedAt = Timestamp.now();
+      updateData.createdAt = oldProject.data().createdAt; // Mantém a data de criação original
+
+      await updateDoc(docRef, updateData);
+    } catch (error) {
+      console.error('Erro ao atualizar projeto:', error);
+      throw error;
+    }
   },
 
   async deleteProject(id) {

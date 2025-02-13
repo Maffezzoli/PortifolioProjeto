@@ -6,6 +6,7 @@ import ProjectList from '../components/ProjectList';
 import ArtworkList from '../components/ArtworkList';
 import { useProjects } from '../hooks/useProjects';
 import { useAuth } from '../hooks/useAuth';
+import { projectService } from '../services/projectService';
 
 function Admin() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -14,6 +15,7 @@ function Admin() {
   const [projectsKey, setProjectsKey] = useState(0);
   const { reloadProjects } = useProjects();
   const { user, loading } = useAuth();
+  const [loadingEdit, setLoadingEdit] = useState(false);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -32,8 +34,21 @@ function Admin() {
     setProjectsKey(prev => prev + 1);
   };
 
+  const handleEditProject = async (projectToEdit) => {
+    try {
+      setLoadingEdit(true);
+      const fullProject = await projectService.getProjectForEdit(projectToEdit.id);
+      setEditingProject(fullProject);
+    } catch (error) {
+      console.error('Erro ao carregar projeto para edição:', error);
+      alert('Erro ao carregar projeto para edição. Tente novamente.');
+    } finally {
+      setLoadingEdit(false);
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <div className="flex border-b mb-6">
         <button
           className={`px-4 py-2 font-medium ${
@@ -71,7 +86,11 @@ function Admin() {
       
       {activeTab === 'projects' && (
         <div className="space-y-8">
-          {editingProject ? (
+          {loadingEdit ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Carregando projeto para edição...</p>
+            </div>
+          ) : editingProject ? (
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-gray-800">Editar Projeto</h2>
@@ -96,7 +115,7 @@ function Admin() {
 
           <ProjectList 
             key={projectsKey}
-            onEdit={setEditingProject}
+            onEdit={handleEditProject}
             onDelete={handleProjectDelete}
           />
         </div>
