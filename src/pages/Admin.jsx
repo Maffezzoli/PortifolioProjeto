@@ -1,42 +1,60 @@
 import { useState } from 'react';
 import ArtworkForm from '../components/ArtworkForm';
-import { artworkService } from '../firebase/artworkService';
+import ProfileEditor from '../components/ProfileEditor';
+import ProjectForm from '../components/ProjectForm';
+import { useProjects } from '../hooks/useProjects';
 
 function Admin() {
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [activeTab, setActiveTab] = useState('profile');
+  const { reloadProjects } = useProjects();
 
-  const handleSuccess = () => {
-    setMessage({
-      type: 'success',
-      text: 'Arte adicionada com sucesso!'
-    });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
-
-  const handleError = (error) => {
-    setMessage({
-      type: 'error',
-      text: 'Erro ao adicionar arte. Tente novamente.'
-    });
-    console.error(error);
+  const handleProjectSuccess = () => {
+    reloadProjects();
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Administração</h1>
-      
-      {message.text && (
-        <div className={`p-4 rounded-md mb-4 ${
-          message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`}>
-          {message.text}
+    <div className="max-w-4xl mx-auto">
+      <div className="flex border-b mb-6">
+        <button
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'profile'
+              ? 'border-b-2 border-purple-600 text-purple-600'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('profile')}
+        >
+          Perfil
+        </button>
+        <button
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'projects'
+              ? 'border-b-2 border-purple-600 text-purple-600'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('projects')}
+        >
+          Projetos
+        </button>
+        <button
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'artworks'
+              ? 'border-b-2 border-purple-600 text-purple-600'
+              : 'text-gray-600'
+          }`}
+          onClick={() => setActiveTab('artworks')}
+        >
+          Artes
+        </button>
+      </div>
+
+      {activeTab === 'profile' && <ProfileEditor />}
+      {activeTab === 'projects' && (
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Criar Novo Projeto</h2>
+          <ProjectForm onSuccess={handleProjectSuccess} />
         </div>
       )}
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Adicionar Nova Arte</h2>
-        <ArtworkForm onSuccess={handleSuccess} onError={handleError} />
-      </div>
+      {activeTab === 'artworks' && <ArtworkForm />}
     </div>
   );
 }
